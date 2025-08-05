@@ -1,6 +1,6 @@
 # backend/models.py
 from enum import Enum
-from typing import Dict, Any
+from typing import Dict, Any, Union
 import httpx
 from config import settings
 
@@ -74,8 +74,10 @@ class ModelClient:
                 # Handle different response formats
                 if isinstance(result, list) and len(result) > 0:
                     text = result[0].get("generated_text", "")
-                else:
+                elif isinstance(result, dict):
                     text = result.get("generated_text", "")
+                else:
+                    text = ""
                 
                 # Calculate tokens (rough estimate)
                 tokens = len(text.split()) * 1.3
@@ -93,8 +95,18 @@ class ModelClient:
                 print(f"Error querying {config['name']}: {e}")
                 # Fallback to next size up
                 if model_size == ModelSize.TINY:
+                    print("Falling back to MEDIUM model...")
                     return await self.query_model(ModelSize.MEDIUM, prompt)
                 elif model_size == ModelSize.MEDIUM:
+                    print("Falling back to LARGE model...")
                     return await self.query_model(ModelSize.LARGE, prompt)
                 else:
-                    raise e
+                    # No more fallbacks available
+                    return {
+                        "text": f"Error: All models failed. Last error: {str(e)}",
+                        "model": config["name"],
+                        "tokens": 0,
+                        "cost": 0,
+                        "model_size": model_size.value,
+                        "error": True
+                    }
