@@ -1,4 +1,3 @@
-# backend/models.py
 from enum import Enum
 from typing import Dict, Any, Union
 import httpx
