@@ -67,3 +67,20 @@ logs/
 data/raw/
 data/processed/
 models/saved/
+
+# TypeScript
+*.tsbuildinfo
+.eslintcache
+
+# Testing
+coverage/
+.nyc_output
+
+# Cache
+.cache/
+*.tmp
+tmp/
+temp/
+
+# Production
+dist/ 
