@@ -1,4 +1,5 @@
 import { QueryInterface } from "../../components/QueryInterface";
+import { StatsDashboard } from "../../components/StatsDashboard";
 
 export default function Home() {
   return (
@@ -14,13 +15,15 @@ export default function Home() {
           </p>
         </header>
 
-        <main className="max-w-6xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <main className="max-w-6xl mx-auto space-y-8">
+          <div className="bg-white rounded-lg shadow-lg p-8">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">
               Try the Cascade Query System
             </h2>
             <QueryInterface />
           </div>
+
+          <StatsDashboard />
 
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white rounded-lg shadow p-6">

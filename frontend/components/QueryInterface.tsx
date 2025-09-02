@@ -1,4 +1,3 @@
-// frontend/components/QueryInterface.tsx
 'use client';
 
 import { useState } from 'react';
@@ -17,15 +16,24 @@ export function QueryInterface() {
     
     setLoading(true);
     setError(null);
+    setResponse(null);
     
     try {
       const result = await api.query({ query });
       setResponse(result);
     } catch (err) {
-      setError('Failed to process query');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to process query';
+      setError(errorMessage);
+      console.error('Query error:', err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleClear = () => {
+    setQuery('');
+    setResponse(null);
+    setError(null);
   };
   
   return (
@@ -36,23 +44,56 @@ export function QueryInterface() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ask anything..."
-            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Ask anything... (e.g., 'What is 2+2?', 'Explain recursion in Python')"
+            className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             disabled={loading}
           />
           <button
             type="submit"
-            disabled={loading}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            disabled={loading || !query.trim()}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
           >
-            {loading ? 'Processing...' : 'Send'}
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                Processing...
+              </span>
+            ) : (
+              'Send Query'
+            )}
           </button>
+          {(query || response || error) && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="px-4 py-3 text-gray-600 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-all"
+              disabled={loading}
+            >
+              Clear
+            </button>
+          )}
         </div>
       </form>
       
       {error && (
-        <div className="p-4 bg-red-50 text-red-700 rounded-lg mb-4">
-          {error}
+        <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg mb-4 flex items-center gap-2">
+          <span className="text-red-500 text-xl">⚠️</span>
+          <div>
+            <p className="font-medium">Error processing your query</p>
+            <p className="text-sm">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {loading && !response && (
+        <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+          <div className="flex items-center gap-3">
+            <div className="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+            <div>
+              <p className="text-blue-800 font-medium">Processing your query...</p>
+              <p className="text-blue-600 text-sm">The cascade system is selecting the optimal model</p>
+            </div>
+          </div>
         </div>
       )}
       
